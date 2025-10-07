@@ -34,11 +34,11 @@ interface TestResult {
 
 export default function FaceRecognitionTest({
   onBack,
-}: FaceRecognitionTestProps): JSX.Element {
+}: FaceRecognitionTestProps) {
   const router = useRouter();
   // phases
   const [phase, setPhase] = useState<
-    "instructions" | "ready" | "running" | "photo-display" | "complete"
+    "instructions" | "running" | "photo-display" | "complete"
   >("instructions");
 
   // rounds & timing
@@ -65,6 +65,7 @@ export default function FaceRecognitionTest({
 
   // choose-face intro audio (play when user clicks "ابدأ الاختبار")
   const chooseAudioRef = useRef<HTMLAudioElement | null>(null);
+  const clickAudioRef = useRef<HTMLAudioElement | null>(null);
   const [introPlaying, setIntroPlaying] = useState<boolean>(false);
   const introPlayedRef = useRef<boolean>(false);
 
@@ -139,6 +140,13 @@ export default function FaceRecognitionTest({
       chooseAudioRef.current = null;
     }
 
+    try {
+      clickAudioRef.current = new Audio("/audio/click.wav");
+      if (clickAudioRef.current) clickAudioRef.current.volume = 0.9;
+    } catch {
+      clickAudioRef.current = null;
+    }
+
     return () => {
       try {
         if (chooseAudioRef.current) {
@@ -147,6 +155,14 @@ export default function FaceRecognitionTest({
         }
       } catch {}
       chooseAudioRef.current = null;
+      
+      try {
+        if (clickAudioRef.current) {
+          clickAudioRef.current.pause();
+          clickAudioRef.current.src = "";
+        }
+      } catch {}
+      clickAudioRef.current = null;
     };
   }, []);
 
@@ -216,11 +232,11 @@ export default function FaceRecognitionTest({
     setStartTime(Date.now());
     roundLockedRef.current = false;
 
-    // speak question immediately and every 5s while the round is active
-    speakText("أي من هذه الوجوه رأيته من قبل في الاختبار السابق؟");
-    audioIntervalRef.current = window.setInterval(() => {
-      speakText("أي من هذه الوجوه رأيته من قبل في الاختبار السابق؟");
-    }, 5000);
+    // // speak question immediately and every 5s while the round is active
+    // speakText("أي من هذه الوجوه رأيته من قبل في الاختبار السابق؟");
+    // audioIntervalRef.current = window.setInterval(() => {
+    //   speakText("أي من هذه الوجوه رأيته من قبل في الاختبار السابق؟");
+    // }, 5000);
 
     // countdown timer (1s)
     intervalRef.current = window.setInterval(() => {
@@ -320,6 +336,12 @@ export default function FaceRecognitionTest({
     if (roundLockedRef.current) return;
 
     roundLockedRef.current = true; // prevent double responses
+
+    // play click audio
+    if (clickAudioRef.current) {
+      clickAudioRef.current.currentTime = 0;
+      clickAudioRef.current.play().catch(() => {});
+    }
 
     // stop timers for this round
     clearTimers();
@@ -427,7 +449,7 @@ export default function FaceRecognitionTest({
               <ArrowLeft className="h-4 w-4" />
             </Button>
             <h1 className="text-3xl font-bold">
-              الاختبار الخامس: التعرف على الوجوه
+              اختبار الخامس: التعرف على الوجوه
             </h1>
           </div>
 
@@ -456,9 +478,9 @@ export default function FaceRecognitionTest({
           </Card>
 
           <div className="flex justify-center gap-4">
-            {/* entering Ready does NOT play audio now */}
-            <Button onClick={() => setPhase("ready")} size="lg">
-              فهمت التعليمات
+            <Button onClick={startTest} size="lg">
+              <Play className="mr-2 h-5 w-5" />
+              ابدأ الاختبار
             </Button>
           </div>
         </div>
@@ -466,47 +488,6 @@ export default function FaceRecognitionTest({
     );
   }
 
-  if (phase === "ready") {
-    return (
-      <div className="min-h-screen bg-background p-8" dir="rtl">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center gap-4 mb-8">
-            <Button variant="outline" size="icon" onClick={onBack}>
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-          </div>
-
-          <Card className="text-center">
-            <CardHeader>
-              <CardTitle className="text-2xl">هل أنت مستعد؟</CardTitle>
-              <CardDescription className="text-lg">
-                اضغط "ابدأ الاختبار" عندما تكون جاهزاً
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {/* Start button: when clicked, shows photos immediately and plays intro audio */}
-              <Button
-                onClick={startTest}
-                size="lg"
-                className={`text-lg px-8 py-4 bg-purple-600 text-white hover:bg-purple-700 ${
-                  introPlaying ? "opacity-60 cursor-not-allowed" : ""
-                }`}
-                disabled={introPlaying}
-              >
-                <Play className="mr-2 h-5 w-5" />
-                ابدأ الاختبار
-              </Button>
-
-              {/* persistent intro banner */}
-              <div className="mt-4">
-                <IntroBanner />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
-  }
 
   if (phase === "photo-display") {
     const progress = ((currentRound + 1) / totalRounds) * 100;

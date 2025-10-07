@@ -1024,14 +1024,14 @@ export default function AuditoryAttentionTest() {
           <Card>
             <CardHeader>
               <CardTitle className="text-2xl">
-                الاختبار الثالث: الانتباه السمعي - المرحلة {currentStage}
+                الاختبار الثالث: الانتباه السمعي - {currentStage === "A" ? "انتباه السمعي 1" : "انتباه السمعي 2"}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               {currentStage === "A" ? (
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold">
-                    تعليمات المرحلة الأولى:
+                    تعليمات انتباه السمعي 1:
                   </h3>
                   <div className="space-y-2 text-sm">
                     <p>
@@ -1054,7 +1054,7 @@ export default function AuditoryAttentionTest() {
               ) : (
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold">
-                    تعليمات المرحلة الثانية:
+                    تعليمات انتباه السمعي 2:
                   </h3>
                   <div className="space-y-2 text-sm">
                     <p>
@@ -1176,7 +1176,7 @@ export default function AuditoryAttentionTest() {
           <Card>
             <CardHeader>
               <CardTitle className="text-2xl">
-                المرحلة الثانية - العرض التوضيحي
+                انتباه السمعي 2 - العرض التوضيحي
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -1256,7 +1256,7 @@ export default function AuditoryAttentionTest() {
 
               <div className="flex justify-center pt-6">
                 <Button onClick={proceedFromDemo} size="lg" className="px-8">
-                  بدء اختبار المرحلة الثانية
+                  بدء اختبار انتباه السمعي 2
                 </Button>
               </div>
             </CardContent>
@@ -1284,7 +1284,7 @@ export default function AuditoryAttentionTest() {
           </Button>
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl">اكتملت المرحلة الأولى!</CardTitle>
+              <CardTitle className="text-2xl">اكتمل انتباه السمعي 1!</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid gap-4 md:grid-cols-2">
@@ -1312,17 +1312,17 @@ export default function AuditoryAttentionTest() {
 
               <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                 <h3 className="font-semibold text-blue-900 mb-2">
-                  مستعد للمرحلة الثانية؟
+                  مستعد لانتباه السمعي 2؟
                 </h3>
                 <p className="text-sm text-blue-800">
-                  المرحلة الثانية لها قواعد مختلفة - ستحتاج إلى تبديل الألوان
+                  انتباه السمعي 2 له قواعد مختلفة - ستحتاج إلى تبديل الألوان
                   للكلمات الحمراء والصفراء!
                 </p>
               </div>
 
               <div className="flex gap-4">
                 <Button onClick={proceedToStageB} size="lg">
-                  متابعة إلى المرحلة الثانية
+                  متابعة إلى انتباه السمعي 2
                 </Button>
                 <Button onClick={() => router.back()} variant="outline">
                   العودة إلى الاختبارات
@@ -1349,7 +1349,7 @@ export default function AuditoryAttentionTest() {
           <Card>
             <CardHeader>
               <CardTitle className="text-2xl">
-                جاهز لبدء المرحلة {currentStage}
+                جاهز لبدء {currentStage === "A" ? "انتباه السمعي 1" : "انتباه السمعي 2"}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -1499,11 +1499,12 @@ export default function AuditoryAttentionTest() {
             <CardContent className="text-center space-y-4">
               <div className="text-lg">
                 <p>
-                  المرحلة أ: {stageAResults.correct} صحيح,{" "}
+                
+                {stageAResults.correct} صحيح,{" "}
                   {stageAResults.incorrect} خطأ
                 </p>
                 <p>
-                  المرحلة ب: {stageBResults.correct} صحيح,{" "}
+                  انتباه السمعي 2: {stageBResults.correct} صحيح,{" "}
                   {stageBResults.incorrect} خطأ
                 </p>
                 <p>

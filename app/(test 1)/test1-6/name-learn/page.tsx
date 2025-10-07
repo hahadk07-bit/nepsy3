@@ -20,7 +20,7 @@ interface TestImage {
 
 export default function AudioVisualTest({ onBack }: AudioVisualTestProps) {
   const router = useRouter(); // Added
-  const [phase, setPhase] = useState<"instructions" | "ready" | "running">(
+  const [phase, setPhase] = useState<"instructions" | "running">(
     "instructions"
   ); // "results" removed
 
@@ -296,7 +296,17 @@ export default function AudioVisualTest({ onBack }: AudioVisualTestProps) {
     } catch (error) {
       console.error("Failed to save results to localStorage", error);
     }
-    router.push("/test1-6/results");
+    
+    // Check if we came from test1-7 flow
+    const fromTest7 = sessionStorage.getItem("fromTest7");
+    if (fromTest7 === "true") {
+      // Clear the flag and proceed to test1-7 without showing results
+      sessionStorage.removeItem("fromTest7");
+      router.push("/test1-7/name-memo");
+    } else {
+      // Normal flow - show results
+      router.push("/test1-6/results");
+    }
   };
 
   // cleanup on unmount
@@ -362,56 +372,8 @@ export default function AudioVisualTest({ onBack }: AudioVisualTestProps) {
                   العودة للقائمة الرئيسية
                 </Button>
                 <Button
-                  onClick={() => setPhase("ready")}
-                  className="bg-blue-600 text-white hover:bg-blue-700"
-                >
-                  التالي
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
-  }
-
-  if (phase === "ready") {
-    return (
-      <div className="min-h-screen bg-background p-8" dir="rtl">
-        <div className="max-w-4xl mx-auto">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-2xl text-center">
-                جاهز للبدء؟
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="text-center">
-                <p className="text-lg mb-4">
-                  اضغط "ابدأ الاختبار" عندما تكون جاهزاً
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  سيتم تشغيل الشرح الصوتي — لا يمكنك البدء قبل انتهائه.
-                </p>
-                {introPlaying && (
-                  <p className="text-sm text-yellow-600 mt-2">
-                    الشرح الصوتي يعمل — الرجاء الانتظار...
-                  </p>
-                )}
-              </div>
-
-              <div className="flex gap-4 justify-center">
-                <Button
-                  onClick={onBack}
-                  variant="outline"
-                  className="bg-gray-100 text-gray-700 hover:bg-gray-200"
-                >
-                  العودة للتعليمات
-                </Button>
-                <Button
                   onClick={startTest}
-                  className="bg-green-600 text-white hover:bg-green-700"
-                  disabled={introPlaying}
+                  className="bg-blue-600 text-white hover:bg-blue-700"
                 >
                   ابدأ الاختبار
                 </Button>
@@ -422,6 +384,7 @@ export default function AudioVisualTest({ onBack }: AudioVisualTestProps) {
       </div>
     );
   }
+
 
   if (phase === "running") {
     const progress = (currentIndex / testImages.length) * 100;

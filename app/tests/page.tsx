@@ -33,44 +33,28 @@ const tests = [
   },
   {
     key: "test1-3",
-    title: "اختبار الانتباه السمعي1",
+    title: "اختبار الانتباه السمعي 1 و 2",
+
     testKey: "اختبار الانتباه السمعي1",
     startHref: "/test1-3/auditory-attention-test",
     resultsHref: "/test1-3/results",
   },
-  {
-    key: "test1-3b",
-    title: "اختبار الانتباه السمعي2",
-    testKey: "اختبار الانتباه السمعي2",
-    startHref: "/test1-3/auditory-attention-test",
-    resultsHref: "/test1-3/results",
-  },
-  {
-    key: "test1-4",
-    title: "اختبار ذاكرة الوجوه 1",
-    testKey: "اختبار ذاكرة الوجوه 1",
-    startHref: "/test1-4/face-memory",
-    resultsHref: "/test1-4/results",
-  },
+
   {
     key: "test1-5",
-    title: "اختبار ذاكرة الوجوه 2 و 3",
+    title: "اختبار ذاكرة الوجوه 1 و 2 و 3",
+
     testKey: "اختبار ذاكرة الوجوه 2 و 3",
-    startHref: "/test1-5/face-choose",
+    startHref: "/test1-5",
     resultsHref: "/test1-5/results",
   },
-  {
-    key: "test1-6",
-    title: "اختبار ذاكرة الأسماء 1",
-    testKey: "اختبار ذاكرة الأسماء 1",
-    startHref: "/test1-6/name-learn",
-    resultsHref: "/test1-6/results",
-  },
+
   {
     key: "test1-7",
-    title: "اختبار ذاكرة الأسماء 2",
+    title: "اختبار ذاكرة الأسماء 1 و 2"
+   ,
     testKey: "اختبار ذاكرة الأسماء 2",
-    startHref: "/test1-7/name-memo",
+    startHref: "/test1-7",
     resultsHref: "/test1-7/results",
   },
   // External tests hosted on rapport app

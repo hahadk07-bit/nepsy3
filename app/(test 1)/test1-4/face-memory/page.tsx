@@ -36,7 +36,7 @@ export default function GenderIdentificationTest({
 }: GenderIdentificationTestProps) {
   const router = useRouter();
   const [phase, setPhase] = useState<
-    "instructions" | "ready" | "running" | "photo-display" | "complete"
+    "instructions" | "running" | "photo-display" | "complete"
   >("instructions");
 
   const photos: PhotoData[] = [
@@ -91,7 +91,7 @@ export default function GenderIdentificationTest({
   useEffect(() => {
     clickAudioRef.current = new Audio("/audio/click.wav");
     finishAudioRef.current = new Audio("/audio/finish.wav");
-    facememAudioRef.current = new Audio("/audio/facemem.ogg");
+    facememAudioRef.current = new Audio("/audio/face_gendre.opus");
 
     if (clickAudioRef.current) clickAudioRef.current.volume = 0.9;
     if (finishAudioRef.current) finishAudioRef.current.volume = 0.9;
@@ -350,9 +350,20 @@ export default function GenderIdentificationTest({
 
       localStorage.setItem("fourthTestResults", JSON.stringify(resultsToSave));
 
-      setTimeout(() => {
-        router.push("/test1-4/results");
-      }, 2000);
+      // Check if we came from test1-5 flow
+      const fromTest5 = sessionStorage.getItem("fromTest5");
+      if (fromTest5 === "true") {
+        // Clear the flag and proceed to test1-5 without showing results
+        sessionStorage.removeItem("fromTest5");
+        setTimeout(() => {
+          router.push("/test1-5/face-choose");
+        }, 2000);
+      } else {
+        // Normal flow - show results
+        setTimeout(() => {
+          router.push("/test1-4/results");
+        }, 2000);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, results]);
@@ -394,7 +405,7 @@ export default function GenderIdentificationTest({
             <Button variant="outline" size="icon" onClick={onBack}>
               <ArrowLeft className="h-4 w-4" />
             </Button>
-            <h1 className="text-3xl font-bold">الاختبار الرابع: تحديد الجنس</h1>
+            <h1 className="text-3xl font-bold">الاختبار الخامس: تحديد الجنس</h1>
           </div>
 
           <Card className="mb-8">
@@ -421,8 +432,9 @@ export default function GenderIdentificationTest({
           </Card>
 
           <div className="flex justify-center gap-4">
-            <Button onClick={() => setPhase("ready")} size="lg">
-              فهمت التعليمات
+            <Button onClick={startTest} size="lg">
+              <Play className="mr-2 h-5 w-5" />
+              ابدأ الاختبار
             </Button>
           </div>
         </div>
@@ -430,40 +442,6 @@ export default function GenderIdentificationTest({
     );
   }
 
-  if (phase === "ready") {
-    return (
-      <div className="min-h-screen bg-background p-8" dir="rtl">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center gap-4 mb-8">
-            <Button variant="outline" size="icon" onClick={onBack}>
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <h1 className="text-3xl font-bold">الاختبار الرابع: تحديد الجنس</h1>
-          </div>
-
-          <Card className="text-center">
-            <CardHeader>
-              <CardTitle className="text-2xl">هل أنت مستعد؟</CardTitle>
-              <CardDescription className="text-lg">
-                اضغط "ابدأ الاختبار" عندما تكون جاهزاً. سيُشغّل صوت تعريفي مرة
-                واحدة، ثم يبدأ الاختبار فور انتهائه.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button
-                onClick={startTest}
-                size="lg"
-                className="text-lg px-8 py-4 bg-blue-600 text-white hover:bg-blue-700"
-              >
-                <Play className="mr-2 h-5 w-5" />
-                ابدأ الاختبار
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
-  }
 
   if (phase === "photo-display") {
     const currentPhoto = photos[currentPhotoIndex];
@@ -497,7 +475,6 @@ export default function GenderIdentificationTest({
               />
             </div>
 
-            <div className="text-xl font-semibold mb-3">هل هذا ولد أم بنت؟</div>
 
             <div className="mb-4">
               <Button
@@ -506,7 +483,7 @@ export default function GenderIdentificationTest({
                 className="px-4 py-2 mb-2"
                 disabled={facememPlaying || introPlaying}
               >
-                تشغيل الصوت
+                🔊
               </Button>
 
               {introPlaying ? (
@@ -549,7 +526,6 @@ export default function GenderIdentificationTest({
                     className="w-16 h-16 object-cover rounded"
                   />
                 </div>
-                <span className="text-lg font-semibold">ولد</span>
               </div>
 
               <div className="flex flex-col items-center">
@@ -576,7 +552,6 @@ export default function GenderIdentificationTest({
                     className="w-16 h-16 object-cover rounded"
                   />
                 </div>
-                <span className="text-lg font-semibold">بنت</span>
               </div>
             </div>
           </div>

@@ -41,13 +41,11 @@ export default function NameRecallTest() {
   const IMAGE_DURATION_SEC = 5;
 
   const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const [timeLeft, setTimeLeft] = useState<number>(IMAGE_DURATION_SEC);
   const [running, setRunning] = useState<boolean>(false); // Start as false
-  const [phase, setPhase] = useState<"instructions" | "ready" | "running">(
+  const [phase, setPhase] = useState<"instructions" | "running">(
     "instructions"
   );
   const [results, setResults] = useState<PerImageResult[]>([]);
-  const timerRef = useRef<number | null>(null);
   const imageStartRef = useRef<number>(Date.now());
   const [introPlaying, setIntroPlaying] = useState(false);
   const [introPlayed, setIntroPlayed] = useState(false);
@@ -88,7 +86,7 @@ export default function NameRecallTest() {
       audioRef.current.onended = () => {
         setIntroPlaying(false);
         setIntroPlayed(true);
-        setPhase("ready");
+        setPhase("running");
         // Auto-start the test after instructions
         setTimeout(() => {
           startTest();
@@ -98,7 +96,7 @@ export default function NameRecallTest() {
       console.error("Failed to play instruction audio:", error);
       setIntroPlaying(false);
       setIntroPlayed(true);
-      setPhase("ready");
+      setPhase("running");
       // Auto-start the test even if audio fails
       setTimeout(() => {
         startTest();
@@ -108,7 +106,7 @@ export default function NameRecallTest() {
 
   // Start the actual test
   const startTest = () => {
-    setPhase("ready");
+    setPhase("running");
     setReadyCountdown(3);
 
     // Start countdown
@@ -123,7 +121,6 @@ export default function NameRecallTest() {
           setPhase("running");
           setRunning(true);
           setCurrentIndex(0);
-          setTimeLeft(IMAGE_DURATION_SEC);
           setResults([]);
           return 0;
         }
@@ -151,30 +148,11 @@ export default function NameRecallTest() {
 
   useEffect(() => {
     if (!running) return;
-    setTimeLeft(IMAGE_DURATION_SEC);
     imageStartRef.current = Date.now();
-    if (timerRef.current !== null) window.clearInterval(timerRef.current);
-    timerRef.current = window.setInterval(
-      () => setTimeLeft((t) => t - 1),
-      1000
-    ) as any;
-    return () => {
-      if (timerRef.current !== null) window.clearInterval(timerRef.current);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentIndex, running]);
-
-  useEffect(() => {
-    if (running && timeLeft <= 0) {
-      recordResponse(null);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [timeLeft, running]);
 
   const recordResponse = (selected: boolean | null) => {
     if (!running) return;
-
-    if (timerRef.current !== null) window.clearInterval(timerRef.current);
 
     const responseTimeMs = Date.now() - imageStartRef.current;
     const newEntry: PerImageResult = {
@@ -190,7 +168,6 @@ export default function NameRecallTest() {
       setCurrentIndex(next);
     } else {
       setRunning(false);
-      setTimeLeft(0);
       saveSummaryAndFinish(updatedResults);
     }
   };
@@ -257,9 +234,6 @@ export default function NameRecallTest() {
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
       if (readyTimerRef.current) {
         clearInterval(readyTimerRef.current);
       }
@@ -302,27 +276,6 @@ export default function NameRecallTest() {
   }
 
   // Show ready phase (after instructions, before test starts)
-  if (phase === "ready") {
-    return (
-      <div className="min-h-screen flex items-center justify-center" dir="rtl">
-        <Card className="w-full max-w-2xl">
-          <CardContent className="text-center space-y-6 py-8">
-            <h2 className="text-2xl font-bold">جاهز للبدء</h2>
-            <p className="text-lg">سيبدأ الاختبار خلال:</p>
-            <div className="flex justify-center">
-              <CircularProgress
-                timeLeft={readyCountdown}
-                totalTime={3}
-                size={80}
-                strokeWidth={6}
-              />
-            </div>
-            <p className="text-3xl font-bold text-blue-600">{readyCountdown}</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   // Show test completion message
   if (!running) {
@@ -341,12 +294,9 @@ export default function NameRecallTest() {
         </div>
 
         <div className="flex justify-start items-start mb-6">
-          <CircularProgress
-            timeLeft={timeLeft}
-            totalTime={10}
-            size={80}
-            strokeWidth={6}
-          />
+          <div className="text-lg font-semibold">
+            الصورة {currentIndex + 1} من {totalImages}
+          </div>
         </div>
 
         <div>
@@ -389,6 +339,16 @@ export default function NameRecallTest() {
               size="lg"
               className="bg-red-600 text-white hover:bg-red-700 w-10 h-10"
             ></Button>
+          </div>
+          
+          <div className="flex justify-center mb-8">
+            <Button
+              onClick={() => handleChoice(null)}
+              size="lg"
+              className="bg-blue-600 text-white hover:bg-blue-700 px-8 py-3"
+            >
+              التالي
+            </Button>
           </div>
         </div>
       </div>
